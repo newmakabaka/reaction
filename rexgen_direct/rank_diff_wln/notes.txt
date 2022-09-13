@@ -1,0 +1,36 @@
+################################################################################
+Most of these commands should be run from the rank_diff_wln folder
+################################################################################
+
+################################################################################
+### Check number of bond changes
+################################################################################
+
+python ../scripts/characterize_number_of_bond_changes.py
+
+Finished processing ../data/train.txt
+{0: 0.17112960993558007, 1: 0.5512951214443752, 2: 0.19556272690601048, 3: 0.06623149608224235, 4: 0.013891231801679563, 5: 0.0018898138301123375}
+Finished processing ../data/valid.txt
+{0: 0.17363333333333333, 1: 0.5489333333333334, 2: 0.19726666666666667, 3: 0.0645, 4: 0.014333333333333333, 5: 0.0013333333333333333}
+Finished processing ../data/test.txt
+{0: 0.173925, 1: 0.549575, 2: 0.198325, 3: 0.063875, 4: 0.012925, 5: 0.001375}
+
+==> Always use n=5 for enumeration, defined by kwargs in mol_graph_direct_useScores.smiles2graph
+
+################################################################################
+### Train model, 1802k params
+################################################################################
+
+mkdir model
+python nntrain_direct_useScores.py --train ../data/train.txt.proc --cand ../core_wln_global/model/train.cbond_detailed --hidden 500 --depth 3 --ncand 150 --ncore 16 --save_dir model
+
+################################################################################
+### Validate
+################################################################################
+
+python nntest_direct_useScores.py --test ../data/valid.txt.proc --cand ../core_wln_global/model/valid.cbond_detailed --hidden 500 --depth 3 --ncand 1500 --ncore 16 --model model --checkpoint ckpt-4900000 --verbose 1 > model/valid.cbond_detailed_4900000
+
+python ../scripts/eval_by_smiles.py --gold ../data/valid.txt.proc --pred model/valid.cbond_detailed_4900000 --bonds_as_doubles true
+
+
+

@@ -1,0 +1,23 @@
+################################################################################
+Most of these commands should be run from the core_wln_global folder
+################################################################################
+
+################################################################################
+### Train model
+################################################################################
+
+mkdir model
+python nntrain_direct.py --train ../data/train.txt.proc --train_ul ../data/precursors-train.txt.proc --hidden 300 --depth 3 --save_dir model
+
+################################################################################
+### Validate
+################################################################################
+
+# General command:
+python nntest_direct.py --test ../data/valid.txt.proc --hidden 300 --depth 3 --model model --checkpoint ckpt-760000
+
+
+# Get bond predictions - includes reactivity scores in output
+python nntest_direct.py --test ../data/valid.txt.proc --hidden 300 --depth 3 --model model-300-3-direct --checkpoint ckpt-760000 --verbose 1 --detailed 1
+python nntest_direct.py --test ../data/train.txt.proc --hidden 300 --depth 3 --model model-300-3-direct --checkpoint ckpt-760000 --verbose 1 --detailed 1
+python nntest_direct.py --test ../data/test.txt.proc --hidden 300 --depth 3 --model model-300-3-direct --checkpoint ckpt-760000 --verbose 1 --detailed 1
